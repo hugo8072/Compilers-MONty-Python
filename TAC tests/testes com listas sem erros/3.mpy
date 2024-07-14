@@ -1,0 +1,4 @@
+#remoção de indice sendo variavel
+p= [1,2,3,4]
+i=2
+remove (p,i)

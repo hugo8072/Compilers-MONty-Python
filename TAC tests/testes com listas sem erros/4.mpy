@@ -1,0 +1,3 @@
+#adição em listas
+x= [1,2,3,45,5]
+add(x,i,n)

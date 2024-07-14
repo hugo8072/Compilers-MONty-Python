@@ -1,0 +1,17 @@
+
+x=0
+y=0
+z=0
+
+
+if(x+3*2>=5+y):
+    print("passa o teste")
+
+x=not y
+
+if (x==1):
+    print("x é diferente de y")
+
+
+z= (x<a and y>w and t!=0)   
+y= (x<a or y>w or t!=0)    

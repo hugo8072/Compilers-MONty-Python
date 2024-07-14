@@ -1,0 +1,15 @@
+def f1(x,y): 
+    print("1")
+    return x
+
+def float f2(float x, float y): 
+    print("2")
+    return y
+
+def f3(int x,y): 
+    print("3")
+    return x
+
+def int[] f4(float[]x,int y):
+    print("4")
+    return y

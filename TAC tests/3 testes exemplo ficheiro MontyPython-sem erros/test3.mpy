@@ -1,0 +1,12 @@
+def func avg(int[] list):
+    int i, sum = 0
+    for i in list:
+        sum = sum + i
+    return sum/size(list)
+
+
+int[] n
+x=1
+while x!=0:
+    x = input("Introduza valor inteiro positivo, para terminar, escreva 0") 
+print("Média da lista é ",avg(n))

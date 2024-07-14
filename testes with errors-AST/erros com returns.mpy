@@ -1,0 +1,19 @@
+def int fact (int k): #erro de indentação no return
+	if k<=1:
+	return 1
+
+def int fact (int k): #erro indentação return
+return 2
+
+def int fact (int k): #2 returns 
+	return fact
+	return 4
+
+
+def int fact (int k)
+	x= return 5	 # associação de return a uma variável
+
+def int fact (int k)
+	return def x (): #retorno de definição de função
+
+

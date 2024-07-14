@@ -1,0 +1,7 @@
+#erros com definiçoes de funções
+#def f (x=4): # atribuição dentro dos elementos a receber na função
+#def f (x>4): #comparação dentro dos elementos a receber na função
+#def int (): # definiçao de função sem definição de nome
+#def while (x): #definição de função com nome de instrução
+def int int (x):# definição de função com nome de tipo
+

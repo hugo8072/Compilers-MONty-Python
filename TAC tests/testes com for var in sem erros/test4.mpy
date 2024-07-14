@@ -1,0 +1,8 @@
+int[] list = [1, 2, 3, 4]
+
+k = size(list)  # k é o tamanho da lista
+int x=2
+j=0
+n=1
+for i in range(j,k,n):
+    list[i]=list[i]*x

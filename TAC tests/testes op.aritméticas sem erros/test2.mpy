@@ -1,0 +1,5 @@
+int x = 3
+x=x**5 #até 5 não entra no loop
+
+x=x**100 #a partir de 5 faz um loop
+

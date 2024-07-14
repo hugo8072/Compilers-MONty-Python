@@ -1,0 +1,30 @@
+#erros com instruções
+for i in list: #Indentação mal feita
+x=x+5
+
+for i in range(k<3):#erro na definição de range
+	x=x+5
+
+for (i<5) in range(k): # comparação em i
+	x= 4
+
+for i in range(j,k,n,z): #utilização de argumento a mais em range
+	x=3
+
+
+while z<5: #indentação mal feita
+x=3
+
+
+#if x<0: #indentação mal no elif
+	x=1	
+	elif (x<4):
+		x=1
+
+
+if x<0: #mais do que 1 else
+	x=3	
+else:
+	x=3	
+else:
+	x=2		

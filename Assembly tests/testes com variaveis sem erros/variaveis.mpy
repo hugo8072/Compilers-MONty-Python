@@ -1,0 +1,19 @@
+x1 = 1  # será assumido como float
+y1 = 1.5  # same
+int z1 = 5
+float g1 = 4, x = 1
+float d1 = 3.6
+float a1 = +3.4#aqui
+float l1 = -3.5#aqui
+int p1 = 3
+int b1 = -2
+float q1 = 3e2
+float n1 = -2.3e+5
+float v1 = +2.0E-2
+w1 = 3e2
+r1 = -2.3e+5
+t1 = +2.0E-2
+int a2, s1 = 0, f1
+float h1, j1, k1
+
+

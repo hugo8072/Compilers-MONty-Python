@@ -1,0 +1,8 @@
+int n = input("introduza um valor inteiro não negativo")
+def int fact (int k):
+    if k<=1:
+        return 1
+    else:
+        return k * fact (k-1)
+
+print(n,"! = ",fact(n))        

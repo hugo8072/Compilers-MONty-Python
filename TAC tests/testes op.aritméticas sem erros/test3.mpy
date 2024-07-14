@@ -1,0 +1,7 @@
+int a = 5
+float b = 6.2
+int c = -4
+float d = 5.3
+
+z = a**0 + b**1 + c**99 + d**a
+#a**0 = 1, b**1 = b ambas as simplificações presentes

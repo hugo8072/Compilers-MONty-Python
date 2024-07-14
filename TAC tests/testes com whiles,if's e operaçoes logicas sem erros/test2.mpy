@@ -1,0 +1,9 @@
+#impressao de numeros de 0 a 5 c/info de par e impar
+int x = 0
+while x<6:
+    print(x)
+    if x//2==0:
+        print(x,"par")
+    else:
+        print(x,"impar")    
+    x=x+1

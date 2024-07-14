@@ -1,0 +1,9 @@
+#erros com declarações de variaveis simples
+x,y,z # inicialização de variaveis sem tipos
+int y = 3.5#int não pode ser um float
+int z = 3e2 #int não pode ser um float
+int y = 3.5 + 4 #ainda não temos  certeza de que não será permitido. Alteremos no futuro se fizer falta
+int = 3 #int não pode ser usado como nome de variavel
+float = 3.14 #float não pode ser usado como nome de variável
+
+#erros com declarações de listas

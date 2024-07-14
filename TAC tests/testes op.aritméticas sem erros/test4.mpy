@@ -1,0 +1,6 @@
+int a = 5
+float b = 6.2
+int c = -4
+float d = 5.3
+
+z = (a+b*c)/(a+b)+45/22*c*a*d/(c+c+d+a)

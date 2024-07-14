@@ -1,0 +1,10 @@
+int x = 3.6
+int n1 = -2.3e+5
+int v1 = +2.0E-2
+int a = 3e2
+int b = -2.3e+5
+int c= +2.0E-2
+int a2, s1 = 2.6, f1
+
+
+

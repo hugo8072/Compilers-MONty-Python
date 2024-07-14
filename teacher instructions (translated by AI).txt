@@ -1,0 +1,143 @@
+# e-portfolio A
+# Compilation 2023/24
+# Language: MONTy Python
+# (My Own Narrowed Typed Python)
+# Language compiler: FCC
+# (discovering what FCC means is worth 0.1 in the final grade)
+# This text contains everything you need to know about the language
+# If you still have questions, see the final note
+# Comments, as you know, start with # and everything from there to the end of the line is ignored
+# Let's now look at variables
+# Unlike usual in Python, variables have explicitly declared types
+# Simple types are float and int
+# If nothing is declared, the variable is of type float
+x = 1 # x is of type float if not previously declared
+int x = 1 # x is of type int
+float x = 1 # x is of type float
+int x = 1.5 # ERROR: assigning a non-integer value to an integer variable at declaration
+# an integer is represented by one or more digits from 0 to 9, with or without a + or – sign
+# a float has 3 possible representations
+# like an integer, one or more digits from 0 to 9, with or without a + or – sign
+# (examples: 5, 0, -3, +2)
+# a number with a point separating the integer part from the decimal part,
+# always having at least one digit to the left and another to the right of the .
+# with or without a sign
+# (examples: 1.0, 0.1, 0.0, 000000.000000, -3.0, +1.5)
+# a number in scientific notation, composed of an integer or decimal number
+# followed by the letter e or E and an integer
+# (examples: 3e2, -2.3e+5, +2.0E-2)
+# if there is an arithmetic or conditional operation between values or variables of different types
+# the integer is automatically converted to float
+# thus, given an arithmetic or conditional operation
+# the result of the operation is:
+# of integer type if both operands are integers
+# of float type if one of the operands is of float type
+# examples
+int i,j=0,k
+# yes, you can declare multiple variables and initialize any of them or not
+# when not initialized, it assumes the value 0
+float x,y,z
+# let's introduce assignment
+z = x + y
+k = i + j
+# no problems, there are no type changes during operations
+z = x * i # value of i converted to float before multiplication
+# VERY IMPORTANT: the variable i remains an integer, its value is converted
+z = i + j # the result of the operation is integer, but it is converted to float before assignment
+i = i * x
+# this is the only case where there is a conversion from float to int
+# the result of the operation is of type float, but it is converted to int before assignment
+# special case of division
+# / is division with decimals, // is integer division
+# when / is used, the operand values are converted to float
+# when // is used, both operands MUST be integers, or it gives an error
+# the same happens with the % operator (remainder of integer division)
+# it can only be used between two integer operators
+# the possible operators are: +, -, *, /, **, // and %
+# with the usual meaning in Python
+# the conditional operators can be comparison operators <, <=, >, >=, !=, ==
+# and logical operators and, or and not
+# thus, a condition will be given by a conditional expression, which can be:
+# a comparison between two arithmetic expressions
+# (examples: x < 5, x+3*2>=5+y, x==0, x!=0)
+# on which logical operators can be applied
+# (examples: x>5 and y<5, x!=0 or y!=0, not (x==0 and y==0))
+# We also have lists, which can have elements of one type or another
+int[] x # list of integers
+float[] x # list of floats
+# Assignment
+x = [1,2,3]
+# if x has already been declared, it has the type of the declaration
+# otherwise, it is a list of floats
+# x[i] list index
+# i=0 is the first in the list, 1 the second, etc...
+# i=-1 is the last in the list, -2 the penultimate, etc...
+# there are three special functions on lists (consider x the list):
+# size(x) returns the size of the list
+# add(x,i,n) adds an element n at position i – if k is size(x), add(x,k+1,n) adds at the end
+# remove(x,i) removes the element at position i
+# ERROR, if the position does not exist or is not possible
+# if not initialized or empty, the list has size 0
+# Let's move on to functions
+# In this language, only one value is returned
+# it can be int, float or a list
+# if nothing is said, the return type is float
+# the same goes for the arguments
+def f(x,y): # f has two arguments of type float and returns a value of type float
+def float f(float x, float y): same, but with explicit declaration
+def f(int x,y): # in this case, the first argument is of type int, the rest is float
+def int[] f(float[]x,int y):
+# returns a list of integers, has as arguments a list of floats and an integer
+# Strings only exist as literal values for the input and print functions
+x = input(“Enter an integer value”)
+print(“The result is “,x)
+# the for statement can be used in two ways
+for i in list: # for each element of a list
+for i in range(k): # i takes values from 0 to k-1
+for i in range(j,k): # i takes values from j to k-1
+for i in range(j,k,n): # i takes values from j to k-1 with increments of n
+# the while statement uses a condition that must be satisfied to remain in the loop
+while z>y:
+ ...
+# the same for if and any elif
+if x<0:
+ ...
+elif y<0:
+ ...
+# any of these 3 statements can have an optional else:
+# indentations are used as in Python
+# FINAL NOTE: Any additional questions should be clarified in the forum
+# if relevant, this document will add or correct parts of the text
+# changes will be visible in red
+# example 1
+# factorial recursive version
+int n = input(“enter a non-negative integer value”)
+def int fact (int k):
+ if k<=1:
+ return 1
+ else:
+ return k * fact (k-1)
+print(n,”! = “,fact(n))
+# example 2
+# factorial non-recursive version
+int n = input(“enter a non-negative integer value”)
+def int fact (int k):
+ int r = 1, k1 = k+1
+ for i in range(2,k1):
+ r = r * i
+ return r
+print(n,”! = “,fact(n))
+# example 3
+# average of a list of positive values
+def func avg(int[] list):
+ int i, sum = 0
+ for i in list:
+ sum = sum + i
+ return sum/size(list)
+int[] n
+x=1
+while x!=0:
+ x = input(“Enter a positive integer value, to finish, write 0”)
+if x!= 0:
+ add(n,0,x)
+print(“Average of the list is “,avg(n))

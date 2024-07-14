@@ -1,0 +1,13 @@
+#erros com declarações de listas
+int x [] #erro de gramatica
+int []  #erro de gramatica
+[] #erro de gramatica
+int [] x = [2,2.5] #definiçao de lista de inteiros com um float
+x= x1[1,2,3] + 3 #operação entre lista completa e inteiro
+float x = x1[1,2,3] + x2[1,2,3] #operação entre listas não possível. a rever se é suposto
+size(x,y) # size apenas pode ser aplicado a uma lista
+add(x)
+add(x,y) # são necessários 3 argumentos para add
+remove(x)
+remove(x,i,z) #apenas 2 argumentos para remove. a  propria lista e elemento a remover
+

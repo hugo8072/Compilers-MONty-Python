@@ -1,0 +1,9 @@
+int[] list = [1, 2, 3, 4]
+
+k = size(list)  # k é o tamanho da lista
+int x
+
+for i in range(k):
+    x=i+x
+    list[i] = list[i]*2
+    #print(list[i])  
