@@ -5,8 +5,24 @@ from output_dir.MontyPythonParserVisitor import MontyPythonParserVisitor
 
 
 class TACGenerator(MontyPythonParserVisitor):
+    """
+    A class to generate Three Address Code (TAC) from a MontyPython parse tree.
+
+    Attributes:
+        tac (list): The list to store TAC instructions.
+        temp_count (int): Counter for temporary variables.
+        label_count (int): Counter for labels.
+        int_vars (list): List to track integer variables.
+        float_vars (list): List to track float variables.
+        initialized_lists (set): Set to track initialized lists.
+        initialized_variables (set): Set to track initialized variables.
+        functions (dict): Dictionary to store function definitions.
+    """
 
     def __init__(self):
+        """
+        Initializes the TACGenerator with empty lists and counters.
+        """
         self.tac = []
         self.temp_count = 0
         self.label_count = 0  # Zé- Contador para rótulos
@@ -15,35 +31,56 @@ class TACGenerator(MontyPythonParserVisitor):
         self.initialized_lists = set()
         self.initialized_variables = set()
         self.functions = {}
-        
-        
-        
+
     def get_int_vars(self):
-     #   print("aqui")
-     #   print(self.int_vars)
+        #   print("aqui")
+        #   print(self.int_vars)
         return self.int_vars
-        
 
     def get_float_vars(self):
-      #  print("aqui2")
-      #  print(self.float_vars)
-        return self.float_vars    
-        
-        
+        #  print("aqui2")
+        #  print(self.float_vars)
+        return self.float_vars
+
     def new_temp(self):
+        """
+        Generates a new temporary variable.
+
+        Returns:
+            str: The name of the new temporary variable.
+        """
         self.temp_count += 1
         return f"t{self.temp_count}"
 
-    def new_label(self):  # Zé - Método para criar novos rótulos
+    def new_label(self):
+        """
+        Generates a new label.
+
+        Returns:
+            str: The name of the new label.
+        """
         self.label_count += 1  # Zé
         return f"L{self.label_count}"  # Zé
-    
+
     def add_function(self, function_name, function):
+        """
+        Adds a function to the functions dictionary.
+
+        Args:
+            function_name (str): The name of the function.
+            function (str): The function definition.
+        """
         self.functions[function_name] = function  # Adiciona a função ao dicionário
-        
-        
+
     # RP atribui o tipo à variavel
     def set_var_type(self, var_name, var_type):
+        """
+        Sets the type of a variable.
+
+        Args:
+            var_name (str): The name of the variable.
+            var_type (str): The type of the variable.
+        """
         if var_type == "int":
             if var_name not in self.int_vars:
                 self.int_vars.append(var_name)
@@ -57,6 +94,15 @@ class TACGenerator(MontyPythonParserVisitor):
 
     # RP retorna o tipo da variavel
     def get_var_type(self, var_name):
+        """
+        Gets the type of a variable.
+
+        Args:
+            var_name (str): The name of the variable.
+
+        Returns:
+            str: The type of the variable.
+        """
         if var_name in self.int_vars:
             return "int"
         elif var_name in self.float_vars:
@@ -65,15 +111,36 @@ class TACGenerator(MontyPythonParserVisitor):
             return None
 
     # RP 31/05 confirma se variavel é usada em loop
-    def is_used_in_condition_or_loop(self, var):  # RP 31/05
+    def is_used_in_condition_or_loop(self, var):
+        """
+        Checks if a variable is used in a condition or loop.
+
+        Args:
+            var (str): The variable to check.
+
+        Returns:
+            bool: True if the variable is used in a condition or loop, False otherwise.
+        """
         for instr in self.tac:  # RP 31/05
             if isinstance(instr, str):  # RP 31/05
-                if f"if False {var}" in instr or f"if {var}" in instr or f"goto {var}" in instr or f"while {var}" in instr or f"for {var}" in instr:  # RP 31/05
+                if (f"if False {var}" in instr or f"if {var}" in instr or
+                        f"goto {var}" in instr or f"while {var}" in instr or
+                        f"for {var}" in instr):  # RP 31/05
                     return True  # RP 31/05
         return False  # RP 31/05
 
     # RP 31/05 extrai variavel do tac
-    def extract_variables(self, expression):
+    @staticmethod
+    def extract_variables(expression):
+        """
+        Extracts variables from an expression.
+
+        Args:
+            expression (str): The expression to extract variables from.
+
+        Returns:
+            list: The list of extracted variables.
+        """
         import re
         expression = str(expression)
         if expression is None:
@@ -83,11 +150,29 @@ class TACGenerator(MontyPythonParserVisitor):
         return set(re.findall(r'\b\w+\b', expression))
 
     def visitFile_input(self, ctx):
+        """
+        Visits the file input context and generates TAC.
+
+        Args:
+            ctx: The file input context.
+
+        Returns:
+            list: The generated TAC.
+        """
         for stmt in ctx.stmt():
             self.visit(stmt)
         return self.tac
 
     def visitStmt(self, ctx):
+        """
+        Visits a statement context and generates TAC.
+
+        Args:
+            ctx: The statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         if ctx.simple_stmt():
             self.visit(ctx.simple_stmt())
         elif ctx.compound_stmt():
@@ -97,11 +182,29 @@ class TACGenerator(MontyPythonParserVisitor):
         return self.tac
 
     def visitSimple_stmt(self, ctx):
+        """
+        Visits a simple statement context and generates TAC.
+
+        Args:
+            ctx: The simple statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         if ctx.small_stmt():
             self.visit(ctx.small_stmt())
         return self.tac
 
     def visitSmall_stmt(self, ctx):
+        """
+        Visits a small statement context and generates TAC.
+
+        Args:
+            ctx: The small statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         if ctx.expr_stmt():
             self.visit(ctx.expr_stmt())
         elif ctx.list_stmt():
@@ -115,6 +218,15 @@ class TACGenerator(MontyPythonParserVisitor):
         return self.tac
 
     def visitPrint_stmt(self, ctx):
+        """
+        Visits a print statement context and generates TAC.
+
+        Args:
+            ctx: The print statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         print_args = []
         current_arg = []
         for child in ctx.children[1:]:  # Ignora o 'print'
@@ -125,14 +237,14 @@ class TACGenerator(MontyPythonParserVisitor):
                     current_arg = []
             elif text not in {'(', ')'}:
                 current_arg.append(text)
-        
+
         # Adiciona o último argumento, se houver
         if current_arg:
             print_args.append(''.join(current_arg).strip())
 
         processed_args = []
         for arg in print_args:
-            #print(arg)
+            # print(arg)
             if arg.startswith('"') and arg.endswith('"'):
                 # É uma string
                 processed_args.append(arg)
@@ -140,27 +252,27 @@ class TACGenerator(MontyPythonParserVisitor):
                 # Pode ser uma função, verificar se está definida
                 func_name = arg.split('(')[0]
                 if func_name in self.functions:
-                    #processed_args.append(arg)
-                    var_name1= func_name = arg.split('(')[1].split(')')[0]
-                    #print(var_name)
-                    flagErr=0
-                    variable_found1=False
+                    # processed_args.append(arg)
+                    var_name1 = arg.split('(')[1].split(')')[0]
+                    # print(var_name)
+
+                    variable_found1 = False
                     for var_name in self.initialized_variables:
-                        
+
                         if f"{var_name}" == f"{var_name1}":
                             processed_args.append(arg)
                             variable_found1 = True
                             break  # Sai do loop se a variável for encontrada
-                    
+
                     for list_name in self.initialized_lists:
                         if f"{list_name}" == f"{var_name1}":
                             processed_args.append(arg)
                             variable_found1 = True
-                            break  # Sai do loop se a variável for encontrada   
-                        
-                    if variable_found1==False:
-                            error_message = f'Error: variable "{var_name1}" is not defined.'
-                            self.tac.append(f'print_error("{error_message}")')
+                            break  # Sai do loop se a variável for encontrada
+
+                    if not variable_found1:
+                        error_message = f'Error: variable "{var_name1}" is not defined.'
+                        self.tac.append(f'print_error("{error_message}")')
 
                 else:
                     # Função não definida, mensagem de erro
@@ -175,13 +287,12 @@ class TACGenerator(MontyPythonParserVisitor):
                         processed_args.append(arg)
                         variable_found = True
                         break  # Sai do loop se a variável for encontrada
-                
+
                 if not variable_found:
                     # Variável não definida, mensagem de erro
                     error_message = f'Error: variable "{arg}" is not defined.'
                     self.tac.append(f'print_error("{error_message}")')
                     continue
-
 
         if len(processed_args) == 1:
             print_statement = f'print({processed_args[0]})'
@@ -190,9 +301,17 @@ class TACGenerator(MontyPythonParserVisitor):
 
         self.tac.append(print_statement)
         return self.tac
-    
 
     def visitExpr_stmt(self, ctx):
+        """
+        Visits an expression statement context and generates TAC.
+
+        Args:
+            ctx: The expression statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         first_word = ctx.getChild(0).getText()
         if first_word in ["int", "float"]:
             # Verificação para declaração de variáveis sem atribuição direta
@@ -202,26 +321,26 @@ class TACGenerator(MontyPythonParserVisitor):
                 self.set_var_type(var_name, first_word)  # Define o tipo da variável
                 if first_word == "int":
                     self.add_to_tac(var_name, "0")
-                    
+
                 else:
                     self.add_to_tac(var_name, "0.0")
-                   
-            elif ctx.getChild(3).getChild(0) and ctx.getChild(3).getChild(0).getText() == "input":  # Verifica se o lado direito é uma função de input
+
+            elif ctx.getChild(3).getChild(0) and ctx.getChild(3).getChild(
+                    0).getText() == "input":  # Verifica se o lado direito é uma função de input
                 var_name = ctx.getChild(1)
-                self.visitInput_func(ctx.getChild(3), var_name)  # Passa o nome da variável
+                self.visitInput_func(ctx.getChild(3))  # Passa o nome da variável
                 self.initialized_variables.add(var_name)
             else:
                 self.handle_explicit_type_declaration(ctx, first_word)
-        
+
         elif ctx.getChild(2).getText().startswith("size"):
             self.handle_size_operation(ctx)
         else:
-            
+
             var_name = ctx.getChild(0).getText()
-            
-            
+
             if ctx.getChild(2).getChild(0).getText() == "input":  # Verifica se o lado direito é uma função de input
-                self.visitInput_func(ctx.getChild(2), var_name)  # Passa o nome da variável
+                self.visitInput_func(ctx.getChild(2))  # Passa o nome da variável
                 self.initialized_variables.add(var_name)
             else:
                 self.handle_implicit_type_declaration(ctx)
@@ -234,37 +353,48 @@ class TACGenerator(MontyPythonParserVisitor):
 
         return self.tac
 
-
-
-
-
     def handle_size_operation(self, ctx):
+        """
+        Handles size operations and generates TAC.
+
+        Args:
+            ctx: The size operation context.
+
+        Returns:
+            list: The generated TAC.
+        """
         declaration_text = ctx.getText()
         var_name = ctx.getChild(0).getText()
         list_name = declaration_text[7:-1]
         self.add_to_tac(var_name, f"{list_name}.length")
-    
-
 
     def handle_implicit_type_declaration(self, ctx):
-        
+        """
+        Handles implicit type declarations and generates TAC.
+
+        Args:
+            ctx: The implicit type declaration context.
+
+        Returns:
+            list: The generated TAC.
+        """
+
         var_name = ctx.getChild(0).getText()
-        
+
         expression = ctx.getChild(2)
-        
+
         # se não tiver tipo, coloca float
         self.set_var_type(var_name, 'float') if self.get_var_type(var_name) is None else None
         var_type = self.get_var_type(var_name)
         if self.is_expression(expression):
-            
+
             # confirma o tipo, se não especificado ou int, é float
             value = self.visitExpr(expression, var_type)
-           
+
             self.set_var_type(value, 'float') if self.get_var_type(value) is None else None
-            value_type = self.get_var_type(value)
             # print(value, value_type, var_name, var_type)
             # faz cast
-            #if var_type != value_type:# RP  31/05
+            # if var_type != value_type:# RP  31/05
             #    value = f"{var_type}({value})"# RP  31/05
         else:
             # print("entra 70")
@@ -278,25 +408,33 @@ class TACGenerator(MontyPythonParserVisitor):
             elif ctx.primary():
                 value = self.visitPrimary(expression, var_type)
             self.set_var_type(value, 'float') if self.get_var_type(value) is None else None
-            value_type = self.get_var_type(value)
             # print(var_name, var_type, value, value_type)
-            #if var_type != value_type:  # RP  31/05
+            # if var_type != value_type:  # RP  31/05
             #    value = f"{var_type}({value})"  # RP  31/05
-       
-        if self.is_list (value):
+
+        if self.is_list(value):
             self.add_to_tac(var_name, value)
-            self.initialized_variables.add(var_name)        
+            self.initialized_variables.add(var_name)
         if self.is_int(value) or self.is_float(value):  # RP garante que é int ou float antes de colocar.0
             self.add_to_tac(var_name, self.format_value(value, var_type))
             self.initialized_variables.add(var_name)
-        #else:
-            #self.add_to_tac(var_name, value)
+        # else:
+        # self.add_to_tac(var_name, value)
         else:
             self.add_to_tac(var_name, value)
             self.initialized_variables.add(var_name)
 
-
     def handle_explicit_type_declaration(self, ctx, var_type):
+        """
+        Handles explicit type declarations and generates TAC.
+
+        Args:
+            ctx: The explicit type declaration context.
+            var_type (str): The type of the variable.
+
+        Returns:
+            list: The generated TAC.
+        """
         declaration_text = ctx.getText()
         variables = declaration_text[len(var_type):].split(',')
         for var in variables:
@@ -315,8 +453,18 @@ class TACGenerator(MontyPythonParserVisitor):
             self.set_var_type(var_name, var_type)  # RP Definir tipo da variável
             self.initialized_variables.add(var_name)  # Marcar a variável como inicializada
 
+    @staticmethod
+    def format_value(value, var_type):
+        """
+        Formats a value according to its type.
 
-    def format_value(self, value, var_type):
+        Args:
+            value (str): The value to format.
+            var_type (str): The type of the variable.
+
+        Returns:
+            str: The formatted value.
+        """
         if 'e' in value.lower():
             value = "{:.10f}".format(float(value))
         if var_type == "float" and '.' not in value:
@@ -324,10 +472,20 @@ class TACGenerator(MontyPythonParserVisitor):
         return value
 
     def add_to_tac(self, var_name, value):
+        """
+        Adds a variable and its value to the TAC.
+
+        Args:
+            var_name (str): The name of the variable.
+            value (str): The value of the variable.
+        """
         self.tac.append((var_name, value))
 
     # percorre o TAC e retira instruções de variaveis não usadas
-    def tac_optimization(self):  # RP 31/05
+    def tac_optimization(self):
+        """
+        Optimizes the TAC by removing unused variables.
+        """
         live_vars = set()  # RP 31/05
         tac_reversed = list(reversed(self.tac))  # RP 31/05
         filtered_tac = []  # RP 31/05
@@ -354,9 +512,18 @@ class TACGenerator(MontyPythonParserVisitor):
         self.tac = filtered_tac  # RP 31/05
 
     def is_list(self, value):
+        """
+        Checks if a value is a list.
+
+        Args:
+            value (str): The value to check.
+
+        Returns:
+            bool: True if the value is a list, False otherwise.
+        """
         if not isinstance(value, str):
             return False
-        
+
         if '[' not in value or ']' not in value:
             return False
 
@@ -371,16 +538,26 @@ class TACGenerator(MontyPythonParserVisitor):
 
         return False
 
-    def is_expression(self, ctx):
+    @staticmethod
+    def is_expression(ctx):
+        """
+        Checks if a context is an expression.
+
+        Args:
+            ctx: The context to check.
+
+        Returns:
+            bool: True if the context is an expression, False otherwise.
+        """
         # Verifica se o contexto tem mais de um filho
         if ctx.getChildCount() > 1:
             return 1
-    # Verifica se há exatamente um filho
+        # Verifica se há exatamente um filho
         elif ctx.getChildCount() == 1:
             first_child = ctx.getChild(0)
-        
+
             # print(f'Tipo do filho único: {type(first_child)}, Filho único: {first_child}')
-        # Verifica se o filho único tem mais de um componente
+            # Verifica se o filho único tem mais de um componente
             if hasattr(first_child, 'getChildCount') and first_child.getChildCount() > 1:
                 # print("entra 101")
                 return 1
@@ -393,15 +570,35 @@ class TACGenerator(MontyPythonParserVisitor):
         # print("entra 97")
         return 0
 
-    def is_float(self, value):
+    @staticmethod
+    def is_float(value):
+        """
+        Checks if a value is a float.
+
+        Args:
+            value (str): The value to check.
+
+        Returns:
+            bool: True if the value is a float, False otherwise.
+        """
         try:
             float(value)
             return True
         except ValueError:
             return False
 
-    def is_int(self, value):
-        
+    @staticmethod
+    def is_int(value):
+        """
+        Checks if a value is an integer.
+
+        Args:
+            value (str): The value to check.
+
+        Returns:
+            bool: True if the value is an integer, False otherwise.
+        """
+
         try:
             int(value)
             return '.' not in value and 'e' not in value.lower()
@@ -409,20 +606,30 @@ class TACGenerator(MontyPythonParserVisitor):
             return False
 
     def visitExpr(self, ctx, dest_type=None):
+        """
+        Visits an expression context and generates TAC.
+
+        Args:
+            ctx: The expression context.
+            dest_type (str, optional): The destination type.
+
+        Returns:
+            str: The temporary variable holding the result.
+        """
         # print("entra 103")
         cast_int = False
         if ctx.getChildCount() == 1:
-        # print("entra 104")
+            # print("entra 104")
             var = self.visit(ctx.getChild(0))
-            #if not var.startswith('t') and var not in self.initialized_variables and not var.isdigit():
-                #raise ValueError(f"Variável {var} não inicializada")
+            # if not var.startswith('t') and var not in self.initialized_variables and not var.isdigit():
+            # raise ValueError(f"Variável {var} não inicializada")
 
             return var
         else:
             # print("entra 107")
             left = self.visit(ctx.getChild(0))
-            #if left not in self.initialized_variables and not left.isdigit():
-               # raise ValueError(f"Variável {left} não inicializada")
+            # if left not in self.initialized_variables and not left.isdigit():
+            # raise ValueError(f"Variável {left} não inicializada")
             for i in range(1, ctx.getChildCount(), 2):
                 # print("entra 336",left)
                 op = ctx.getChild(i).getText()
@@ -437,17 +644,27 @@ class TACGenerator(MontyPythonParserVisitor):
             return f"int({left})" if cast_int is True else left  # RP 31/05
 
     def visitTerm(self, ctx, dest_type=None):
+        """
+        Visits a term context and generates TAC.
+
+        Args:
+            ctx: The term context.
+            dest_type (str, optional): The destination type.
+
+        Returns:
+            str: The temporary variable holding the result.
+        """
         # print("entra 120")
         if ctx.getChildCount() == 1:
             var = self.visit(ctx.getChild(0))
-           # if var not in self.initialized_variables and not var.isdigit():
-             #   raise ValueError(f"Variável {var} não inicializada")
+            # if var not in self.initialized_variables and not var.isdigit():
+            #   raise ValueError(f"Variável {var} não inicializada")
             return var
         else:
             # print("entra 123")
             left = self.visit(ctx.getChild(0))
-            #if left not in self.initialized_variables and not left.isdigit():
-             #   raise ValueError(f"Variável {left} não inicializada")
+            # if left not in self.initialized_variables and not left.isdigit():
+            #   raise ValueError(f"Variável {left} não inicializada")
             for i in range(1, ctx.getChildCount(), 2):
                 op = ctx.getChild(i).getText()
                 right = self.visit(ctx.getChild(i + 1))
@@ -467,34 +684,62 @@ class TACGenerator(MontyPythonParserVisitor):
             return left
 
     def visitEnd_function(self, ctx):
+        """
+        Visits an end function context and generates TAC.
+
+        Args:
+            ctx: The end function context.
+
+        Returns:
+            list: The generated TAC.
+        """
         if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == 'return':
             return_expression = ctx.getChild(1).getText()
             if return_expression.isdigit():
                 self.tac.append(f"return {return_expression}")
-                return return_expression    
+                return return_expression
             else:
                 self._validate_return_expression(return_expression)
                 self.tac.append(f"return {return_expression}")
                 return return_expression
 
     def _validate_return_expression(self, expr):
+        """
+        Validates a return expression.
+
+        Args:
+            expr (str): The return expression to validate.
+
+        Returns:
+            bool: True if the expression is valid, False otherwise.
+        """
         tokens = self._tokenize_expression(expr)
         for token in tokens:
             if not self._is_valid_token(token):
                 raise ValueError(f"Variável ou função não inicializada ou inválida: {token}")
 
-    def _tokenize_expression(self, expr):
+    @staticmethod
+    def _tokenize_expression(expr):
+        """
+        Tokenizes an expression.
+
+        Args:
+            expr (str): The expression to tokenize.
+
+        Returns:
+            list: The list of tokens.
+        """
         # Simplesmente divide a expressão em tokens separados por espaços e caracteres especiais
         tokens = []
         current_token = ''
         i = 0
         while i < len(expr):
-            if expr[i:i+5] == 'size(':
+            if expr[i:i + 5] == 'size(':
                 if current_token:
                     tokens.append(current_token.strip())
                     current_token = ''
                 end_index = expr.find(')', i)
-                tokens.append(expr[i:end_index+1].strip())
+                tokens.append(expr[i:end_index + 1].strip())
                 i = end_index + 1
             elif expr[i] in '/*+-':
                 if current_token:
@@ -529,6 +774,15 @@ class TACGenerator(MontyPythonParserVisitor):
         return tokens
 
     def _is_valid_token(self, token):
+        """
+        Checks if a token is valid.
+
+        Args:
+            token (str): The token to check.
+
+        Returns:
+            bool: True if the token is valid, False otherwise.
+        """
         if token in '/*+-':
             return True
         if token.isdigit():  # Validar inteiros
@@ -548,27 +802,44 @@ class TACGenerator(MontyPythonParserVisitor):
         else:
             return token in self.initialized_variables or token in self.functions
 
-
     def _validate_expression(self, expr):
+        """
+        Validates an expression.
+
+        Args:
+            expr (str): The expression to validate.
+
+        Returns:
+            bool: True if the expression is valid, False otherwise.
+        """
         tokens = self._tokenize_expression(expr)
         for token in tokens:
             if not self._is_valid_token(token):
                 return False
         return True
 
-
     def visitFactor(self, ctx, dest_type=None):
+        """
+        Visits a factor context and generates TAC.
+
+        Args:
+            ctx: The factor context.
+            dest_type (str, optional): The destination type.
+
+        Returns:
+            str: The temporary variable holding the result.
+        """
         # print("entra 135")
         if ctx.getChildCount() == 1:
             var = self.visit(ctx.getChild(0))
-            #if var not in self.initialized_variables and not var.isdigit():
-                #raise ValueError(f"Variável {var} não inicializada")
+            # if var not in self.initialized_variables and not var.isdigit():
+            # raise ValueError(f"Variável {var} não inicializada")
             return var
         else:
             left = self.visit(ctx.getChild(0))
-           # if left not in self.initialized_variables and not left.isdigit():
-               # raise ValueError(f"Variável {left} não inicializada")
-            #left_type = self.get_var_type(left)  # RP tipo
+            # if left not in self.initialized_variables and not left.isdigit():
+            # raise ValueError(f"Variável {left} não inicializada")
+            # left_type = self.get_var_type(left)  # RP tipo
             leftinicial = self.visit(ctx.getChild(0))
             for i in range(1, ctx.getChildCount(), 2):
                 op = ctx.getChild(i).getText()
@@ -582,7 +853,8 @@ class TACGenerator(MontyPythonParserVisitor):
                     if not is_variable:
                         if exponent == 0:  # RP caso especial expoente 0, retorna sempre 1
                             return f"1"
-                        elif exponent <= 5:  # RP se o expoente for até 5, menos linhas sem loop, senão usa loop para poupar linhas de código
+                        elif exponent <= 5:  # RP se o expoente for até 5, menos linhas sem loop, senão usa loop para
+                            # poupar linhas de código
                             a = 1
                             while a < exponent:
                                 temp = self.new_temp()
@@ -631,7 +903,8 @@ class TACGenerator(MontyPythonParserVisitor):
                         self.tac.append((temp, f"{temp} - 1"))
                         self.tac.append(f"goto {label_start}")
                         # RP se negativo
-                        self.tac.append((label_expoente_neg, None))  # RP final como imprimir TAC trata do :, colocado None
+                        self.tac.append(
+                            (label_expoente_neg, None))  # RP final como imprimir TAC trata do :, colocado None
                         self.tac.append((temp, f"- {temp}"))
 
                         # Loop negativo
@@ -640,7 +913,8 @@ class TACGenerator(MontyPythonParserVisitor):
                         self.tac.append((result, f"{result} * {base}"))
                         self.tac.append((temp, f"{temp} - 1"))
                         self.tac.append(f"goto {label_negative}")
-                        self.tac.append((label_end_negative, None))  # RP final como imprimir TAC trata do :, colocado None
+                        self.tac.append(
+                            (label_end_negative, None))  # RP final como imprimir TAC trata do :, colocado None
                         self.tac.append((result, f"1 / {result}"))
                         self.tac.append((label_end, None))  # RP final como imprimir TAC trata do :, colocado None
                         left = result
@@ -654,13 +928,22 @@ class TACGenerator(MontyPythonParserVisitor):
 
             return left
 
-
     def visitPrimary(self, ctx, dest_type=None):
+        """
+        Visits a primary context and generates TAC.
+
+        Args:
+            ctx: The primary context.
+            dest_type (str, optional): The destination type.
+
+        Returns:
+            str: The temporary variable holding the result.
+        """
         if ctx.NAME():
             return ctx.NAME(0).getText()
-            #if var not in self.initialized_variables:
-                #raise ValueError(f"Variável {var} não inicializada")
-            
+            # if var not in self.initialized_variables:
+            # raise ValueError(f"Variável {var} não inicializada")
+
         elif ctx.LIST_VALUE():
             return ctx.LIST_VALUE().getText()
         elif ctx.INT():
@@ -677,39 +960,63 @@ class TACGenerator(MontyPythonParserVisitor):
             temp = self.new_temp()
             self.tac.append((temp, f"{sign}{primary}"))
             return temp
-        
+
         elif ctx.input_func():
             return self.visitInput_func(ctx.input_func())
 
-    def visitInput_func(self, ctx, var_name):
-        # Visit the argument context to get the prompt text
+    def visitInput_func(self, ctx):
+        """
+        Visits an input function context and generates TAC.
+
+        Args:
+            ctx: The input function context.
+
+        Returns:
+            list: The generated TAC.
+        """
+        var_name = ctx.NAME().getText()
         prompt = self.visit(ctx.arg())
         self.tac.append((var_name, f"input({prompt})"))  # Directly use the given variable
-        
-
-     
+        return var_name
 
     def visitArg(self, ctx):
-    # This method assumes that arg can be either a STRING or another expression
+        """
+        Visits an argument context and generates TAC.
+
+        Args:
+            ctx: The argument context.
+
+        Returns:
+            str: The argument text.
+        """
+        # This method assumes that arg can be either a STRING or another expression
         if ctx.STRING():
             return ctx.STRING(0).getText()  # Access the first element of the list
         else:
-            return self.visit(ctx.expr())  
-    
-    
+            return self.visit(ctx.expr())
+
     def visitPrimary_int(self, ctx):
         return ctx.getText()
 
     def visitPrimary_float(self, ctx):
         return ctx.getText()
 
-    def visitTerminal(self, node):
+    @staticmethod
+    def visitTerminal(node):
         return node.getText()
 
     def visitList_stmt(self, ctx):
+        """
+        Visits a list statement context and generates TAC.
+
+        Args:
+            ctx: The list statement context.
+
+        Returns:
+            list: The generated TAC.
+        """
         declaration_text = ctx.getText()
         array = []
-        value_list = []
 
         if '=' in declaration_text:
             var_name, values = declaration_text.split('=')
@@ -741,7 +1048,7 @@ class TACGenerator(MontyPythonParserVisitor):
                     array.append(float(i))
             self.add_to_tac(var_name, array)
             self.initialized_lists.add(var_name)
-            
+
         else:
             var_name = declaration_text.strip()
             value = '[]'
@@ -751,10 +1058,19 @@ class TACGenerator(MontyPythonParserVisitor):
                 var_name = var_name[7:].strip()
             self.add_to_tac(var_name, value)
             self.initialized_lists.add(var_name)
-        
+
         return self.tac
 
     def visitList_op(self, ctx):
+        """
+        Visits a list operation context and generates TAC.
+
+        Args:
+            ctx: The list operation context.
+
+        Returns:
+            list: The generated TAC.
+        """
         declaration_text = ctx.getText()
         if 'add' in declaration_text:
             param = declaration_text[4:-1].split(',')
@@ -765,7 +1081,6 @@ class TACGenerator(MontyPythonParserVisitor):
             index_str = param[1].strip()
             if not index_str.isdigit() and index_str not in self.initialized_variables:
                 raise ValueError(f"Índice {index_str} não inicializado")
-            
 
             value_str = param[2].strip()
             if not value_str.isdigit() and value_str not in self.initialized_variables:
@@ -794,7 +1109,7 @@ class TACGenerator(MontyPythonParserVisitor):
             self.add_to_tac(last_index_temp, f"{len_temp} - 1")
 
             # Label for the start of the loop
-            self.add_to_tac(loop_label, None)
+            self.add_to_tac(loop_label, "None")
 
             # If the index is greater than the size, go to the end
             self.tac.append(f"if {last_index_temp} < {index_temp} goto {end_label}")
@@ -809,7 +1124,7 @@ class TACGenerator(MontyPythonParserVisitor):
             self.tac.append(f"goto {loop_label}")
 
             # Label for the end of the loop
-            self.add_to_tac(end_label, None)
+            self.add_to_tac(end_label, "None")
 
             # Insert the new value at position i
             self.add_to_tac(f"{list_name}[{index_temp}]", new_value)
@@ -823,7 +1138,6 @@ class TACGenerator(MontyPythonParserVisitor):
             # Update the length of the list
             self.add_to_tac(f"{list_name}.length", incr_len_temp)
 
-
         elif 'remove' in declaration_text:
             param = declaration_text[7:-1].split(',')
             list_name = param[0].strip()
@@ -831,8 +1145,8 @@ class TACGenerator(MontyPythonParserVisitor):
                 raise ValueError(f"Lista {list_name} não inicializada")
 
             index_value = param[1].strip()
-            #if index_value not in self.initialized_variables:
-               #print("835") 
+            # if index_value not in self.initialized_variables:
+            # print("835")
             if not index_value.isdigit() and index_value not in self.initialized_variables:
                 raise ValueError(f"Índice {index_value} não inicializado")
 
@@ -859,7 +1173,7 @@ class TACGenerator(MontyPythonParserVisitor):
             self.tac.append(f"if {index_temp} < 0 goto {error_label}")  # Ensure the index is non-negative
 
             # Loop to shift elements
-            self.add_to_tac(loop_label, None)
+            self.add_to_tac(loop_label, "None")
             self.tac.append(f"if {index_temp} >= {len_temp} - 1 goto {end_label}")
             self.add_to_tac(next_index_temp, f"{index_temp} + 1")
             self.add_to_tac(loop_temp, f"{list_name}[{next_index_temp}]")
@@ -868,14 +1182,14 @@ class TACGenerator(MontyPythonParserVisitor):
             self.tac.append(f"goto {loop_label}")
 
             # Update the list length
-            self.add_to_tac(end_label, None)
+            self.add_to_tac(end_label, "None")
             self.add_to_tac(current_len_temp, f"{list_name}.length")
             self.add_to_tac(new_len_temp, f"{current_len_temp} - 1")
             self.add_to_tac(f"{list_name}.length", new_len_temp)
             self.tac.append(f"goto {end_label}")
 
             # Error handling for invalid index
-            self.add_to_tac(error_label, None)
+            self.add_to_tac(error_label, "None")
             self.tac.append("print ERRO: Indice invalido para remocao")
 
         elif 'size' in declaration_text:
@@ -885,7 +1199,6 @@ class TACGenerator(MontyPythonParserVisitor):
 
             temp = self.new_temp()
             self.add_to_tac(temp, f"{list_name}.length")
-            
 
         elif '=' in declaration_text:
             list_name = ctx.getChild(0).getText()
@@ -897,7 +1210,6 @@ class TACGenerator(MontyPythonParserVisitor):
             else:
                 self.add_to_tac(ctx.getChild(0), ctx.getChild(2))
 
-   
     def initialize_list(self, list_name):
         self.initialized_lists.add(list_name)
         self.initialized_variables.add(list_name)  # Supondo que a lista também é tratada como uma variável
@@ -907,23 +1219,20 @@ class TACGenerator(MontyPythonParserVisitor):
 
     # Zé ate ao fim, da linha
     # Implementação das estruturas IF, ELSE e WHILE
-    
+
     def visitFor_stmt(self, ctx):
         loop_var = ctx.getChild(1).getText()  # Acessa o nome da variável de loop
-        iter_expr = ctx.getChild(3)
-        
-        # print (ctx.getChildCount())
-        if ctx.getChildCount() == 6:  # hugo: se sao 6 args é sinal que é for in list (nao me perguntem pq sao 6 e nao 5)
-           
+
+        if ctx.getChildCount() == 6:  # se sao 6 args é sinal que é for in list (nao me perguntem pq sao 6 e nao 5)
+
             iter_expr = ctx.getChild(3)
-            
+
             # print(f"loop_var: {loop_var}, iter_expr: {iter_expr}, suite_result: {ctx.suite()}")
             self.visit_variable_for(loop_var, iter_expr, ctx.suite())
-        
+
         elif ctx.getChildCount() == 9:  # hugo-entra no primeiro caso do range
             # Chama visit_range_for se houver 8 filhos
             # print("aiaiaia")
-            range_type = 1
             iter_start = 0
             iter_expr = ctx.getChild(5).getText()
             iter_incr = 1
@@ -931,79 +1240,70 @@ class TACGenerator(MontyPythonParserVisitor):
             #   print("Texto de iter_expr:", iter_expr)
             # print("Tipo de iter_expr:", type(iter_expr))
             # print(f"loop_var: {loop_var}, iter_expr: {iter_expr}, suite_result: {ctx.suite()}")
-            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite(), range_type)
-            
+            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite())
+
         elif ctx.getChildCount() == 11:
-            
-            range_type = 2
-            
-            #self.initialized_variables.add(iter_var)
-            #print(iter_var)
+
             iter_var_use = ctx.getChild(1).getText()
-            
+
             self.initialized_variables.add(iter_var_use)
 
             iter_start = ctx.getChild(5).getText()
-            
+
             iter_expr = ctx.getChild(7).getText()
-            
+
             iter_incr = 1
-            
-            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite(), range_type)
-        
+
+            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite())
+
         elif ctx.getChildCount() == 13:
-            range_type = 3
             iter_start = ctx.getChild(5).getText()
             iter_expr = ctx.getChild(7).getText()
             iter_incr = ctx.getChild(9).getText()
             # print(iter_start, iter_expr, iter_incr)
-            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite(), range_type)
-               
+            self.visit_range_for(loop_var, iter_start, iter_expr, iter_incr, ctx.suite())
+
         return self.tac
 
-    def visit_range_for(self, loop_var, iter_start, var_expr, iter_inc, suite, range_type):
-        
+    def visit_range_for(self, iter_start, var_expr, iter_inc, suite, range_type):
+
         # print("entra aqui 329")
         list_temp = var_expr
         # print("entra aqui 331")
         index_temp = self.new_temp()
-        
+
         if range_type == 1:
             self.tac.append((index_temp, "0"))
-            
+
         if range_type == 2 or range_type == 3:
-            
             self.tac.append((index_temp, iter_start))
-          
 
         # print("entra 333")
         loop_label = self.new_label()
         end_label = self.new_label()
-        
+
         self.tac.append((loop_label, None))
         # print("entra aqui 336")
 
         temp_cond = self.new_temp()
-        
+
         self.tac.append((temp_cond, f"{index_temp} < {list_temp}"))
         self.tac.append(f"if {temp_cond} == 0 goto {end_label}")  # RP final removi o none
-        
+
         loop_var = self.new_temp()
-        
+
         self.tac.append((loop_var, f"{index_temp}"))
         # self.tac.append((loop_var, f"{temp_loop_var}"))
-        
+
         # Corpo do loop
-        
-        
 
         self.visit(suite)
-        
+
         temp_var = self.new_temp()
-        
+
         self.tac.append((temp_var, f"{index_temp} + {iter_inc}"))
         self.tac.append(f"{index_temp} = {temp_var}")  # RP final faltava um espaço
-        self.tac.append(f"goto {loop_label}")   # RP final removi o none
+        self.tac.append(f"goto {loop_label}")  # RP final removi o none
         self.tac.append((end_label, None))
 
     def visit_variable_for(self, loop_var, var_expr, suite):
@@ -1021,16 +1321,13 @@ class TACGenerator(MontyPythonParserVisitor):
         temp_cond = self.new_temp()
         self.tac.append((temp_cond, f"{index_temp} < len({list_temp})"))
         self.tac.append(f"if {temp_cond} == 0 goto {end_label}")  # RP final removi o none
-        
-       
+
         self.tac.append((loop_var, f"{list_temp}[{index_temp}]"))
-        
 
         # Corpo do loop
-        
+
         self.visit(suite)
-        
-    
+
         self.tac.append((index_temp, f"{index_temp} + 1"))
         self.tac.append(f"goto {loop_label}")  # RP final removi o none
         self.tac.append((end_label, None))
@@ -1056,9 +1353,7 @@ class TACGenerator(MontyPythonParserVisitor):
                 self.tac.append((label_elif_else, None))
 
             if ctx.ELSE():
-                #print("894")
                 self.visit(ctx.getChild(6))
-                #print("896")
 
             self.tac.append((label_end, None))
 
@@ -1068,19 +1363,19 @@ class TACGenerator(MontyPythonParserVisitor):
         label_start = self.new_label()
         label_end = self.new_label()
 
-    # Adicionando a condição do 'while'
+        # Adicionando a condição do 'while'
         condition = self.visit(ctx.logical_expr())
         # Adicionando a etiqueta de início
         self.tac.append((label_start, None))
         self.tac.append(f"if False {condition} goto {label_end}")  # RP final removi o none
 
-    # Visitando o corpo do 'while'
+        # Visitando o corpo do 'while'
         self.visit(ctx.suite())
 
-    # Adicionando a instrução para voltar ao início do 'while'
+        # Adicionando a instrução para voltar ao início do 'while'
         self.tac.append(f"goto {label_start}")  # RP final removi o none
 
-    # Adicionando a etiqueta de fim
+        # Adicionando a etiqueta de fim
         self.tac.append((label_end, None))
 
         return self.tac
@@ -1109,7 +1404,8 @@ class TACGenerator(MontyPythonParserVisitor):
             return temp
         return None
 
-    def handle_type_and_conversion(self, left, right, op, dest_type):  # RP 31/05 verifica se é necessário cast, faz cast intermédio e devolve temp e necessidade de cast
+    def handle_type_and_conversion(self, left, right, op,
+                                   dest_type):
         if self.is_int(right):  # RP 31/05
             right_type = 'int'  # RP 31/05
         elif self.is_float(right):  # RP 31/05
@@ -1133,7 +1429,7 @@ class TACGenerator(MontyPythonParserVisitor):
 
         self.tac.append((temp, result))  # RP 31/05
         self.set_var_type(temp, dest_type)  # RP 31/05
-        return temp, cast_int    # RP 31/05
+        return temp, cast_int  # RP 31/05
 
     def visitExprcomp(self, ctx, dest_type=None):
         if ctx.getChildCount() > 1 and ctx.getChild(0).getText() == "not":
@@ -1155,7 +1451,8 @@ class TACGenerator(MontyPythonParserVisitor):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.getChild(0))
         else:
-            if ctx.getChildCount() > 2 and ctx.getChild(0).getText() == '(' and ctx.getChild(ctx.getChildCount() - 1).getText() == ')':
+            if ctx.getChildCount() > 2 and ctx.getChild(0).getText() == '(' and ctx.getChild(
+                    ctx.getChildCount() - 1).getText() == ')':
                 left = self.visit(ctx.getChild(1))
                 for i in range(2, ctx.getChildCount() - 1, 2):
                     op = ctx.getChild(i).getText()
@@ -1175,7 +1472,6 @@ class TACGenerator(MontyPythonParserVisitor):
                 return left
 
     def visitFunction(self, ctx):
-        #print("862")
         self.visit(ctx.functions_stmt())
         self.visit(ctx.suite_func())
         function_name = None
@@ -1183,13 +1479,11 @@ class TACGenerator(MontyPythonParserVisitor):
 
         # Processar a declaração da função
         for i, child in enumerate(ctx.functions_stmt().children):
-           
+
             if child.getText() == 'def':
                 next_child = ctx.functions_stmt().getChild(i + 1).getText()
-                #print(next_child)
                 if next_child in 'func':
-                    #print("911")
-                    function_name = ctx.functions_stmt().getChild(i+2).getText()
+                    function_name = ctx.functions_stmt().getChild(i + 2).getText()
                 elif next_child in ['float', 'int']:  # Verifica se o próximo token é um tipo de retorno
                     return_type = next_child
                     next_child = ctx.functions_stmt().getChild(i + 2).getText()
@@ -1205,77 +1499,59 @@ class TACGenerator(MontyPythonParserVisitor):
         for stmt in ctx.suite_func().children:
             if stmt.getText().startswith('return'):
                 return_var = stmt.getChild(1).getText()
-                #print(return_var)
-                #if return_var not in self.initialized_variables:
-                    #raise ValueError(f"Variável {return_var} não inicializada")
+                if return_var not in self.initialized_variables:
+                    raise ValueError(f"Variable {return_var} not started")
 
         if return_type:
             self.tac.append(f"endfunc {return_type} {function_name}")
         else:
-            #print("915")
             self.tac.append(f"endfunc {function_name}")
 
         return self.tac
 
     def visitFunctions_stmt(self, ctx):
-        
+
         function_name = None
         param_list = []
         param_types = []
-        #print("903")
-        # Process function parameters and function name
+
         for i, child in enumerate(ctx.children):
             if child.getText() == 'def':
-                
+
                 next_child = ctx.getChild(i + 1).getText()
-                #print(next_child)
                 if next_child in 'func':
                     # print("911")
-                    function_name = ctx.getChild(i+2).getText()
-                    
+                    function_name = ctx.getChild(i + 2).getText()
+
                 elif next_child in ['float', 'int']:
-                    #print("975")
                     next_child = ctx.getChild(i + 2).getText()
-                    if next_child== '[':
-                        #print("865")
-                        function_name = ctx.getChild(i+4).getText()
-                        #print(function_name)
-                        #print("teste")
-                        #self.initialized_lists.add(fun)
+                    if next_child == '[':
+                        function_name = ctx.getChild(i + 4).getText()
                     else:
-                        
+
                         function_name = ctx.getChild(i + 2).getText()
-                        
+
                 else:
-                     function_name = ctx.getChild(i+1 ).getText()       
+                    function_name = ctx.getChild(i + 1).getText()
             elif child.getText() in '[]':
-                list_name = ctx.getChild(i+1 ).getText()
+                list_name = ctx.getChild(i + 1).getText()
                 self.initialized_lists.add(list_name)
-            elif child.getText() not in {'(', ')', ':', 'def', ',','[',']',function_name,'float','int','func'}:
+            elif child.getText() not in {'(', ')', ':', 'def', ',', '[', ']', function_name, 'float', 'int', 'func'}:
                 param_type = child.getText()
-                #print(param_type)
-                param_name = ctx.getChild(i ).getText()
-                #print(param_name)
+                param_name = ctx.getChild(i).getText()
                 param_types.append(param_type)
                 param_list.append(param_name)
                 self.set_var_type(param_name, param_type[:-2] if '[]' in param_type else param_type)
-                #print(param_name)
                 self.initialized_variables.add(param_name)  # Marcar o parâmetro como inicializado
 
         # Generate TAC for function definition
-        #print("1063")
         self.tac.append(f"func {function_name}")
-        self.functions[function_name] = (param_list, param_types) 
-        #print(function_name)
+        self.functions[function_name] = (param_list, param_types)
         for param in param_list:
             self.tac.append(f"param {param}")
-            #print(param)
             self.initialized_variables.add(param)
 
         return self.tac
-
-
-
 
     def visitFunctionCall(self, ctx):
         function_name = ctx.NAME().getText()
@@ -1295,33 +1571,28 @@ class TACGenerator(MontyPythonParserVisitor):
 
         return ret_temp
 
-    def generate_TAC(self, tree):
-        self.visit(tree)
-        self.tac_optimization()  # RP 31/05 corre a analise do TAC, vale a pena comparar com e sem para ver se o que é removido é mesmo para remover.
+    def generate_TAC(self, var_tree):
+        self.visit(var_tree)
+        self.tac_optimization()
 
         return self.tac
-    
 
-def generate_TAC(tree,flag):
+
+def generate_TAC(var_tree, flag):
     tac_generator = TACGenerator()
-    #return tac_generator.visit(tree)
-    generated_tree= tac_generator.generate_TAC(tree)
-    ints= tac_generator.get_int_vars()
-    floats= tac_generator.get_float_vars()
-   # print (ints)
-   # print (floats)
-    
+    generated_tree = tac_generator.generate_TAC(var_tree)
+    ints = tac_generator.get_int_vars()
+    floats = tac_generator.get_float_vars()
 
-    if flag==1:
-        return (generated_tree) #, tac_generator.int_vars, tac_generator.float_vars  # RP 31/05
-    if flag==2:
+    if flag == 1:
+        return generated_tree
+    if flag == 2:
         return ints
-    if flag==3:
+    if flag == 3:
         return floats
 
 
 # Exemplo de uso
-
 
 
 # Exemplo de uso
@@ -1330,20 +1601,15 @@ lexer = MontyPythonLexer(input_stream)
 stream = CommonTokenStream(lexer)
 parser = MontyPythonParser(stream)
 tree = parser.file_input()
-tac = generate_TAC(tree,1)
-int_vars= generate_TAC(tree,2)
-float_vars= generate_TAC(tree,3)
-
-
-
-
+tac = generate_TAC(tree, 1)
+int_vars = generate_TAC(tree, 2)
+float_vars = generate_TAC(tree, 3)
 
 # Imprimir a TAC
 # Abre o arquivo 'test.tac' em modo de escrita ('w')
 with open('test.tac', 'w') as f:
     f.write("TAC:\n")
     for instruction in tac:
-        #print(instruction)
         if isinstance(instruction, tuple) and len(instruction) == 2:
             if instruction[0] == instruction[1]:
                 f.write(f"   {instruction[0]}\n")
@@ -1352,7 +1618,7 @@ with open('test.tac', 'w') as f:
             elif isinstance(instruction[0], str) and instruction[0].startswith('return'):
                 f.write(f"   {instruction[0]}  {instruction[1]}\n")
             else:
-                if instruction[0] in int_vars: 
+                if instruction[0] in int_vars:
                     f.write(f"   {instruction[0]} = {instruction[1]} 'int'\n")
                 elif 'length' in instruction[0] or 'length' in instruction[1]:
                     f.write(f"   {instruction[0]} = {instruction[1]} 'int'\n")

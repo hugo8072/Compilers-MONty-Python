@@ -1,3 +1,7 @@
+﻿MONTy Python Language Guide
+Overview
+This repository contains the comprehensive guide for MONTy Python, a custom programming language developed for educational purposes in the 2023/24 academic year. MONTy Python stands for "My Own Narrowed Typed Python," featuring explicitly typed variables and unique syntax rules. 
+
 
 To test the generation of the lexer and parser:
 
@@ -6,10 +10,6 @@ To test the generation of the lexer and parser:
 2. Use the following command to generate the intermediate files:
    java -cp "C:\Program Files\Java\jdk-21\lib\antlr-4.13.1-complete.jar" org.antlr.v4.Tool -Dlanguage=Python3 -listener -visitor MontyPythonLexer.g4 MontyPythonParser.g4 -o output_dir
    (or the path to ANTLR on your computer)
-
-3. In `text.py`:
-
-4. Modify `sys.path.append(r'C:\Users\Hugo\Desktop\compilador\output_dir')` to your directory.
 
 After that, type the following in the terminal:
    python test.py

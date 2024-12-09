@@ -5655,7 +5655,7 @@ class MontyPythonParser ( Parser ):
 
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitInput_func" ):
-                return visitor.visitInput_func(self)
+                return visitor.visitInput_func(self, )
             else:
                 return visitor.visitChildren(self)
 
